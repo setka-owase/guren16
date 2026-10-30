@@ -526,10 +526,21 @@ window.PHONE = {
   passcode: "",                // 잠금화면 암호. 비워두면 아무 숫자 4자리나 눌러도 열려요 (예: "0828")
   /* 잠금 해제 후 휴대폰 속 시간이 afterMinutes분 흐르면 걸려오는 전화 (받아도 소리는 나지 않아요) */
   incomingCall: {
-    from: "+1(050)142-1762", afterMinutes: 2, ringSeconds: 30,
+    from: "히이라기 신야", afterMinutes: 3, ringSeconds: 30,
     /* 전화를 받으면 화면에 차례대로 뜨는 대사 (ms = 보여주는 시간, 1000 = 1초). 마지막 대사 뒤 전화가 끊겨요 */
     lineStart: 1100,      // 받고 1.1초 뒤 첫 대사
     hangUpAfter: 900,     // 마지막 대사가 사라지고 0.9초 뒤 끊김
+    lines: [
+      { text: "구렌, 어디야?", ms: 2800 },
+      { text: "지금 다들 모였어.", ms: 2800 },
+      { text: "빨리 와.", ms: 3000 }
+    ]
+  },
+  /* 25일로 넘어간 뒤 폰 시계가 22:02가 되면 걸려오는 전화 */
+  incomingCall25: {
+    from: "+1(050)142-1762", ringSeconds: 30,
+    lineStart: 1100,
+    hangUpAfter: 900,
     lines: [
       { text: "살아 있었군요. 구렌 군.", ms: 2800 },
       { text: "인간이길 포기하고", ms: 2800 },
@@ -953,7 +964,9 @@ window.PHONE = {
         { date: "2012년 05월 24일 목요일" },
         { text: "구렌님, 오늘 저녁도 카레 이신가요?", time: "14:47" },
         { me: true, text: "응. 안에 재료는 원하는 대로 넣어.", time: "14:48" },
-        { text: "네! 알겠습니다.", time: "14:52" }
+        { text: "네! 알겠습니다.", time: "14:52" },
+        { date: "2012년 12월 26일 수요일" },
+        { text: "저녁 메뉴는 어떻게 할까요?", time: "11:02" }
       ],
       "유키미 시구레": [
         { date: "2026년 10월 2일 금요일" },
@@ -1237,7 +1250,7 @@ const draw=()=>document.querySelectorAll("#dots i").forEach((d,i)=>d.classList.t
 function press(c){if(c==="⌫")entry=entry.slice(0,-1);else if(entry.length<4)entry+=c;draw();
  if(entry.length===4){if(!P.passcode||entry===P.passcode)setTimeout(unlock,150);else{const d=$("#dots");d.classList.add("sh");setTimeout(()=>{d.classList.remove("sh");entry="";draw()},400);$("#hint").textContent="암호가 맞지 않아요"}}}
 addEventListener("keydown",e=>{if(cur==="pass"){if(/\d/.test(e.key))press(e.key);if(e.key==="Backspace")press("⌫")}});
-function unlock(){home();L("homel")}
+function unlock(){home();L("homel");if(!rang){rang=true;const go=()=>{if(warped||eggOn||cur==="call")setTimeout(go,10000);else ring()};setTimeout(go,P.incomingCall.afterMinutes*60000)}}
 $("#home").onclick=()=>{if($("#cc").classList.contains("on"))$("#cc").classList.remove("on");else if(cur==="appl"){home();L("homel")}else if(cur==="pass")L("lock");else if(cur==="lock")toPass()};
 /* 일정 */
 const CAL=P.calendar,col=e=>CAL.calendars[e.cal]||"#888",pad=n=>String(n).padStart(2,"0");
@@ -1306,7 +1319,7 @@ async function startCall(name,after,o){
  await w(1200);
  P.calls.unshift({name,kind:"휴대전화",dir:sc.incoming?"in":"out",missed:miss,when:hm()});
  if(sc.renameTo)ren[name]=sc.renameTo;(after||(()=>L("appl")))()}
-function ring(){const ic=P.incomingCall,back=cur;if(cur==="call"){setTimeout(ring,5000);return}
+function ring(ic0){const ic=ic0||P.incomingCall,back=cur;if(cur==="call"){setTimeout(()=>ring(ic0),5000);return}
  $("#call").innerHTML='<div class="cn">'+esc(ic.from)+'</div><div class="cs">수신 전화</div><button class="cb" id="dec" style="left:40px">거절</button><button class="cb" id="acc" style="left:180px;background:#2bb24c">받기</button>';L("call");
  const miss=()=>{P.calls.unshift({name:ic.from,kind:"휴대전화",dir:"in",missed:true,when:hm()});P.badges.phone=(P.badges.phone||0)+1;L(back);if(back==="homel")home()};
  const x=setTimeout(miss,ic.ringSeconds*1000);$("#dec").onclick=()=>{clearTimeout(x);miss()};
@@ -1413,7 +1426,7 @@ async function startCall(name,after,o){
  await w(1200);
  P.calls.unshift({name,kind:"휴대전화",dir:sc.incoming?"in":"out",missed:miss,when:hm()});
  if(sc.renameTo)ren[name]=sc.renameTo;(after||(()=>L("appl")))()}
-function ring(){const ic=P.incomingCall,back=cur;if(cur==="call"){setTimeout(ring,5000);return}
+function ring(ic0){const ic=ic0||P.incomingCall,back=cur;if(cur==="call"){setTimeout(()=>ring(ic0),5000);return}
  $("#call").innerHTML='<div class="cn">'+esc(ic.from)+'</div><div class="cs">휴대전화</div><button class="rc" id="dec" style="left:50px;background:#ff3b30">'+HANG+'</button><button class="rc" id="acc" style="left:204px;background:#34c759">{{phone}}</button>';L("call");
  const miss=()=>{P.calls.unshift({name:ic.from,kind:"휴대전화",dir:"in",missed:true,when:hm()});P.badges.phone=(P.badges.phone||0)+1;L(back);if(back==="homel")home()};
  const x=setTimeout(miss,ic.ringSeconds*1000);$("#dec").onclick=()=>{clearTimeout(x);miss()};
@@ -1567,8 +1580,8 @@ function sfSearch(q){const C=P.chrome,toks=q.split(/\s+/).filter(Boolean),hit=C.
 let eggOn=0,warped=0,glT=null;
 function glSet(sc){const t=$("#gt"),d=$("#gd"),o=$("#go");if(!t)return;t.setAttribute("seed",Math.random()*500|0);d.setAttribute("scale",sc*(.5+Math.random()*.9));o.setAttribute("dx",(-3-Math.random()*sc/6).toFixed(1))}
 function evSwap(on){DEL[0].tail=on?"결국 못 구했네?":"어떻게 하면 널 구할 수 있을까? 마히루.";const e=P.calendar.events.find(x=>x.date==="2012-12-25"&&/^마히루-\s?이케부쿠로$|^월귀조$/.test(x.title));if(!e)return;if(on){e.title="월귀조";e.place="오늘로부터 8년"}else{e.title="마히루- 이케부쿠로";delete e.place}}
-let memoT=0,memoOn=0;
-setInterval(()=>{if(warped&&!rang&&!eggOn&&pt()>=79320&&pt()<79320+3600){rang=true;ring()}},500);
+let memoT=0,memoOn=0,rang25=false;
+setInterval(()=>{if(warped&&!rang25&&!eggOn&&pt()>=79320&&pt()<79320+3600){rang25=true;ring(P.incomingCall25)}},500);
 const _noteView=noteView;
 noteView=function(n,back){_noteView(n,back);clearTimeout(memoT);if(warped&&back==="del"&&n===DEL[0])memoT=setTimeout(()=>{const t=document.querySelector("#appl .ndt");if(warped&&cur==="appl"&&t&&/결국 못 구했네/.test(t.textContent))memoHorror()},3000)};
 async function memoHorror(){if(memoOn)return;memoOn=1;
