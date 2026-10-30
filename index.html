@@ -661,6 +661,12 @@ window.PHONE = {
     ] },
     "기본": { lines: [
       { text: "여보세요?" },
+      { who: "me", text: "이치노세 구렌입니다." },
+      { text: "아, 네. 말씀하세요." }
+    ] },
+    /* 키패드로 직접 번호를 눌러 걸었을 때 (저장된 대사가 없는 번호) */
+    "키패드": { lines: [
+      { text: "여보세요?" },
       { who: "me", text: "이치노세 구렌입니다. 누구세요?" },
       { text: "……아." },
       { text: "죄송합니다. 잠깐 다른 분과 헷갈렸나 봐요. 잘못 전화를 건 것 같습니다." },
@@ -1415,7 +1421,7 @@ function ring(){const ic=P.incomingCall,back=cur;if(cur==="call"){setTimeout(rin
 /* 통화 앱 */
 let pTab="recents",kdv="";
 const avt=n=>/^[\d+(]/.test(n)?'<div class="av2" style="width:42px;height:42px">'+PERSON+"</div>":'<div class="av2" style="width:42px;height:42px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px">'+esc(nm(n)[0])+"</div>";
-const cNames=()=>[...new Set([...P.calls.map(c=>c.name),...Object.keys(P.callScripts),...P.Line.chats.filter(c=>!c.channel).map(c=>c.name)])].filter(n=>n!=="answerRate"&&n!=="기본"&&!/^[\d+(]/.test(n)).sort((a,b)=>nm(a).localeCompare(nm(b),"ko"));
+const cNames=()=>[...new Set([...P.calls.map(c=>c.name),...Object.keys(P.callScripts),...P.Line.chats.filter(c=>!c.channel).map(c=>c.name)])].filter(n=>n!=="answerRate"&&n!=="기본"&&n!=="키패드"&&!/^[\d+(]/.test(n)).sort((a,b)=>nm(a).localeCompare(nm(b),"ko"));
 function phoneApp(tab){if(tab)pTab=tab;P.badges.phone=0;const T=pTab;let h="",b="",top=84;
  if(T==="recents"||T==="search"){h=T==="search"?'<div class="hd"><input id="pq" class="sq" placeholder="검색"></div>':'<div class="hd"><span class="pill">편집</span><b style="font-size:16px">통화</b><span class="pill ic">{{filter}}</span></div>';
   b=P.calls.map((c,i)=>'<div class="pr" data-i="'+i+'">'+avt(c.name)+'<div class="mb"><b style="color:'+(c.missed?"#ff3b30":"#111")+'">'+esc(nm(c.name))+'</b><div class="mp" style="-webkit-line-clamp:1">'+(c.dir==="in"?"{{inn}}":"{{out}}")+" "+esc(c.kind)+(c.count?" ("+c.count+")":"")+"</div></div><small>"+c.when+'</small><span class="cbn">{{phone}}</span></div>').join("")}
@@ -1514,7 +1520,7 @@ function contactsView(){const C=contactList();mount('<div class="hd"><span class
 function padView(){let num="";const LT={2:"ABC",3:"DEF",4:"GHI",5:"JKL",6:"MNO",7:"PQRS",8:"TUV",9:"WXYZ"};
  mount('<div class="dnum" id="dnum"></div><div class="dpad">'+"123456789*0#".split("").map(c=>'<button data-k="'+c+'"><b>'+c+'</b>'+(LT[c]?'<small>'+LT[c]+'</small>':'')+'</button>').join("")+'</div><div class="dact"><span style="width:56px"></span><button class="dcall" id="dcall">{{phone}}</button><span class="ddel" id="ddel" style="visibility:hidden">'+TI2('<path d="M21 5H9l-6 7 6 7h12z"/><path d="M12 9l5 6M17 9l-5 6"/>')+'</span></div>'+ptbHtml(2),a=>{ptbBind(a);const dn=$("#dnum"),dd=$("#ddel"),up=()=>{dn.textContent=num;dd.style.visibility=num?"visible":"hidden"};
   a.querySelectorAll(".dpad button").forEach(b=>b.onclick=()=>{if(num.length<20){num+=b.dataset.k;up()}});dd.onclick=()=>{num=num.slice(0,-1);up()};
-  $("#dcall").onclick=()=>{if(num)startCall(num,()=>phoneApp(2))}})}
+  $("#dcall").onclick=()=>{if(num)startCall(num,()=>phoneApp(2),P.callScripts[num]?undefined:P.callScripts["키패드"])}})}
 function searchView(){const C=contactList();const draw=q=>C.filter(n=>nm(n).includes(q)).map(crow).join("")+P.calls.filter(c=>/^[+\d]/.test(c.name)&&c.name.includes(q)).map(c=>c.name).filter((x,i,l)=>l.indexOf(x)===i).map(crow).join("");
  mount('<h1 class="ttl" style="top:44px">검색</h1><div class="psr" style="top:96px">'+TI2('<circle cx="11" cy="11" r="6.500"/><path d="M16 16l4 4"/>')+'<input id="psi" placeholder="이름 또는 번호" style="flex:1;border:0;background:none;font:inherit;outline:none;color:#111"></div><div class="pls" id="pr" style="top:140px">'+draw("")+'</div>'+ptbHtml(3),a=>{ptbBind(a);callBind(a);$("#psi").oninput=e=>{$("#pr").innerHTML=draw(e.target.value.trim());callBind(a)}})}
 /* v21 사파리 */
