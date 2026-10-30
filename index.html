@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>종말의 세라프</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Serif+KR:wght@400&display=swap">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -1215,8 +1215,8 @@ const sbc=c=>{scr.style.setProperty("--sbc",c);scr.style.setProperty("--sbb",c==
 const L=n=>{document.querySelectorAll(".layer").forEach(e=>e.classList.toggle("on",e.id===n));cur=n;$("#t").textContent=(n==="lock"||n==="pass")?"":hm();if(window.stopCam)stopCam();if(window.renderLockNotifs)renderLockNotifs();if(n!=="appl")sbc("#fff");$("#cc").classList.remove("on")};
 function fitLast(){const ps=[...document.querySelectorAll("#story p:not(.sp)")],p=ps[ps.length-1];if(!p||p.querySelector(".lk"))return;p.style.whiteSpace="nowrap";p.style.fontSize="";let fs=parseFloat(getComputedStyle(p).fontSize);while(p.scrollWidth>p.clientWidth+1&&fs>9){fs-=.5;p.style.fontSize=fs+"px"}}
 fitLast();addEventListener("resize",fitLast);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitLast);
-function fit(){const vh=(window.visualViewport&&visualViewport.height)||innerHeight,s=Math.min((vh-30)/740,(innerWidth-16)/360,1.3);$("#body").style.transform="scale("+s+")";$("#stage").style.width=360*s+"px";$("#stage").style.height=740*s+"px"}
-addEventListener("resize",fit);if(window.visualViewport)visualViewport.addEventListener("resize",fit);
+function fit(){const vh=innerHeight,s=Math.min((vh-30)/740,(innerWidth-16)/360,1.3);$("#body").style.transform="scale("+s+")";$("#stage").style.width=360*s+"px";$("#stage").style.height=740*s+"px"}
+addEventListener("resize",fit);
 document.querySelectorAll(".lk").forEach(a=>a.onclick=()=>{if(!t0)t0=Date.now();entry="";draw();$("#hint").textContent="";L("lock");$("#ov").classList.add("on");fit()});
 $("#x").onclick=()=>{$("#ov").classList.remove("on");if(window.stopCam)stopCam();try{sessionStorage.setItem("rs",String(window.scrollY||document.documentElement.scrollTop||document.body.scrollTop||0))}catch(e){}location.reload()};
 try{const r=sessionStorage.getItem("rs");if(r){sessionStorage.removeItem("rs");const go=()=>{scrollTo(0,+r);document.documentElement.scrollTop=+r;document.body.scrollTop=+r};go();addEventListener("load",()=>{go();setTimeout(go,300)})}}catch(e){}
